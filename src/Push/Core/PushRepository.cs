@@ -1,20 +1,21 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebPush.Models;
-
-namespace WebPush.Core
+﻿namespace WebPush.Core
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Models;
+
+    /// <summary>
+    /// Repository des push.
+    /// </summary>
     public static class PushRepository
     {
         public static IEnumerable<PushButton> AllPushButtons { get; private set; }
 
-        private static Dictionary<int, List<PushButton>> Customers { get; set;  }
+        public static Dictionary<int, List<PushButton>> Customers { get; set; }
 
-        public static ConcurrentBag<KeyValuePair<DateTime, Guid>> AllPushings { get; private set;  }
-
+        public static ConcurrentBag<PushingItem> AllPushings { get; private set; }
 
         static PushRepository()
         {
@@ -31,10 +32,23 @@ namespace WebPush.Core
             };
 
             Customers = new Dictionary<int, List<PushButton>>();
+
+            AllPushings = new ConcurrentBag<PushingItem>();
+        }
+
+        public static void Reset()
+        {
+            Initialize();
         }
 
         public static IEnumerable<PushButton> GetCustomerPushButton(int idCustomer)
         {
+            // Est-ce que le client existe ? Si non, on le crée.
+            if (!Customers.ContainsKey(idCustomer))
+            {
+                Customers.Add(idCustomer, new List<PushButton>());
+            }
+
             return Customers[idCustomer];
         }
 
@@ -54,7 +68,7 @@ namespace WebPush.Core
             }
 
             // Est-ce que le bouton est déjà associé à un compte client ?
-            if (Customers.Values.SelectMany(p => p).Any(p  => p.Id == pushButtonId))
+            if (Customers.Values.SelectMany(p => p).Any(p => p.Id == pushButtonId))
             {
                 return false;
             }
@@ -82,11 +96,42 @@ namespace WebPush.Core
             return true;
         }
 
-        public static void SavePush(Guid pushButton)
+        public static bool SavePush(Guid pushButtonId)
         {
             // A quel compte client le bouton est associé ?
+            if (Customers == null || Customers.Count == 0)
+            {
+                return false;
+            }
 
+            int customer = FindCustomerByPushButton(pushButtonId);
+            if (customer < 0)
+            {
+                return false;
+            }
 
+            AllPushings.Add(
+                new PushingItem
+                {
+                    Date = DateTime.Now,
+                    CustomerId = customer,
+                    PushButtonId = pushButtonId,
+                });
+
+            return true;
+        }
+
+        private static int FindCustomerByPushButton(Guid pushButtonId)
+        {
+            foreach (var customer in Customers)
+            {
+                if (customer.Value != null && customer.Value.Exists(p => p.Id == pushButtonId))
+                {
+                    return customer.Key;
+                }
+            }
+
+            return -1;
         }
     }
 }

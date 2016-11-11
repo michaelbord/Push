@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-
-namespace WebPush
+﻿namespace WebPush
 {
+    using System.IO;
+    using Microsoft.AspNetCore.Hosting;
+
+    /// <summary>
+    /// Programme Push.
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// Mains the specified arguments.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()
