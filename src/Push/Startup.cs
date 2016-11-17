@@ -27,6 +27,12 @@
             Configuration = builder.Build();
         }
 
+        /// <summary>
+        /// Gets the configuration.
+        /// </summary>
+        /// <value>
+        /// The configuration.
+        /// </value>
         public IConfigurationRoot Configuration { get; }
 
         /// <summary>
