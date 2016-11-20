@@ -2,6 +2,7 @@
 namespace WebPush.Controllers
 {
     using System;
+    using System.Linq;
     using Core;
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
@@ -31,7 +32,7 @@ namespace WebPush.Controllers
                 new
                 {
                     PushButtons = PushRepository.AllPushButtons,
-                    Pushings = PushRepository.AllPushings,
+                    Pushings = PushRepository.AllPushings.OrderByDescending(p => p.Date),
                     Customers = PushRepository.Customers
                 },
                 settings);
