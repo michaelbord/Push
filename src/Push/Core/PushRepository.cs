@@ -56,6 +56,8 @@
             };
 
             Customers = new Dictionary<int, List<PushButton>>();
+            Customers.Add(1, new List<PushButton>());
+            Customers[1].Add(AllPushButtons.First());
 
             AllPushings = new ConcurrentBag<PushingItem>();
         }
